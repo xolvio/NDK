@@ -20,7 +20,7 @@ Once you learn  how to use these building blocks, you can build (almost) any bac
 
 This framework has been used to build a number of applications for enterprise clients at our sister comapny [Xolvio](https://www.xolv.io), and we're excited to share it with the world as the open-source counterpart to our cloud offering at [XSpecs.ai](https://www.xspecs.ai).
 
-_(XSpecs istslef is built using the DDK!)_
+_(XSpecs itself is built using the DDK!)_
 
 ## 🌟 Features
 

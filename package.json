@@ -1,0 +1,40 @@
+{
+  "name": "@xspecs/ddk",
+  "version": "1.0.0",
+  "repository": "https://github.com/XSpecs/ddk",
+  "author": "Sam Hatoum <sam@xspecs.io>",
+  "license": "Elastic License 2.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": "please-use-yarn",
+    "yarn": ">=1.22.0"
+  },
+  "scripts": {
+    "test": "jest --coverage",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write ."
+  },
+  "packageManager": "yarn@4.0.0-rc.42",
+  "devDependencies": {
+    "@types/eslint": "^8",
+    "@types/jest": "^29.5.1",
+    "@types/node": "^20.2.3",
+    "@types/prettier": "^2",
+    "@typescript-eslint/eslint-plugin": "^5.59.7",
+    "@typescript-eslint/parser": "^5.59.7",
+    "eslint": "^8.41.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-no-only-tests": "^3.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "jest": "^29.5.0",
+    "jest-config": "^29.5.0",
+    "prettier": "^2.8.8",
+    "testdouble": "^3.18.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "ts-jest": "^29.1.0"
+  }
+}

@@ -80,6 +80,11 @@ describe('EventUpcaster', () => {
       expect(newEvent?.aggregateId).toBe('1234');
       expect((<NewEvent>newEvent).newId).toBe('d5529ca9-bda5-4223-9522-b817ec6a4963');
     });
+    it('should return null when the upcast is ....', async () => {
+      const eventUpcaster = new EventUpcaster();
+      const x = eventUpcaster.upcast({}, '');
+      expect(x).toBeNull();
+    });
     it('should throw an error when a deprecated event type is not registered', async () => {
       expect(() => {
         new EventUpcaster().withReplacePropertiesUpcast([{ from: 'foo', to: 'bar' }]);

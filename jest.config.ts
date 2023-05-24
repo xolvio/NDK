@@ -1,5 +1,5 @@
-import type {Config} from 'jest';
-import {defaults} from 'jest-config';
+import type { Config } from 'jest';
+import { defaults } from 'jest-config';
 
 const config: Config = {
   moduleFileExtensions: [...defaults.moduleFileExtensions, 'mts'],
@@ -16,7 +16,7 @@ const config: Config = {
         warnOnly: false,
       },
     ],
-  }
+  },
 };
 
 export default config;

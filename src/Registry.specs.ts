@@ -18,32 +18,46 @@ class FooEvent extends Event {
 
 class BazCommandHandlers {
   @Handles(BarCommand)
-  doSomething() {}
+  doSomething() {
+    // empty for testing
+  }
 }
 
 class KazCommandHandlers {
-  doSomething() {}
+  doSomething() {
+    // empty for testing
+  }
 }
 
 class FooEventHandlers {
   @Handles(FooEvent)
-  handleSomething() {}
+  handleSomething() {
+    // empty for testing
+  }
 
   @Handles(ANY)
-  handleAny() {}
+  handleAny() {
+    // empty for testing
+  }
 }
 
 class BarEventHandlers {
-  handleSomething() {}
+  handleSomething() {
+    // empty for testing
+  }
 }
 
 class MyReadModel implements IReadModel<unknown> {
   @Handles(CATCHUP)
-  async handle(): Promise<void> {}
+  async handle(): Promise<void> {
+    // empty for testing
+  }
 }
 
 class MyOtherReadModel implements IReadModel<unknown> {
-  async handle(): Promise<void> {}
+  async handle(): Promise<void> {
+    // empty for testing
+  }
 }
 
 describe('Registry', () => {
@@ -111,8 +125,5 @@ describe('Registry', () => {
       Registry.getInstance().registerReadModelHandlerInstance(myOtherReadModel, messageBus);
       expect(messageBus._registerReadModel).not.toBeCalled();
     });
-  });
-  describe('Handles', () => {
-    it('should ', () => {});
   });
 });

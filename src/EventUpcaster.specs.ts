@@ -81,9 +81,15 @@ describe('EventUpcaster', () => {
       expect((<NewEvent>newEvent).newId).toBe('d5529ca9-bda5-4223-9522-b817ec6a4963');
     });
     it('should throw an error when a deprecated event type is not registered', async () => {
-      expect(() => {new EventUpcaster().withReplacePropertiesUpcast([{from: 'foo', to: 'bar'}])}).toThrow('No deprecated event type registered');
-      expect(() => {new EventUpcaster().withClonePropertiesUpcast([{from: 'foo', to: 'bar'}])}).toThrow('No deprecated event type registered');
-      expect(() => {new EventUpcaster().withCopyPropertyValuesUpcast([{from: 'foo', to: 'bar'}])}).toThrow('No deprecated event type registered');
+      expect(() => {
+        new EventUpcaster().withReplacePropertiesUpcast([{ from: 'foo', to: 'bar' }]);
+      }).toThrow('No deprecated event type registered');
+      expect(() => {
+        new EventUpcaster().withClonePropertiesUpcast([{ from: 'foo', to: 'bar' }]);
+      }).toThrow('No deprecated event type registered');
+      expect(() => {
+        new EventUpcaster().withCopyPropertyValuesUpcast([{ from: 'foo', to: 'bar' }]);
+      }).toThrow('No deprecated event type registered');
     });
   });
 });

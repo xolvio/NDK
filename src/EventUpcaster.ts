@@ -11,7 +11,7 @@ type FromToValuePair = {
 export interface IEventUpcaster {
   hasUpcaster(eventType: string): boolean;
 
-  upcast(eventData: { [key: string]: object }, eventType: string): Event | undefined;
+  upcast<T extends Event>(eventData: { [key: string]: object }, eventType: string): T | null;
 
   registerDeprecatedEvent(deprecatedEventType: string, replacementEventType: string): IEventUpcaster;
 
@@ -33,35 +33,39 @@ export class EventUpcaster implements IEventUpcaster {
     return !!this.deprecatedEventToReplacementEventMap[eventType];
   }
 
-  upcast(eventData: { [key: string]: unknown }, eventType: string): Event | undefined {
+  upcast<T extends Event>(eventData: { [key: string]: unknown }, eventType: string): T | null {
     this.cloneProperties[eventType]?.forEach((item) => {
+      // eslint-disable-next-line no-prototype-builtins
       if (eventData.hasOwnProperty(item.from)) {
         eventData[item.to] = eventData[item.from];
       }
     });
     if (this.deprecatedEventToReplacementEventMap[eventType]) {
       this.copyPropertyValues[eventType]?.forEach((item) => {
+        // eslint-disable-next-line no-prototype-builtins
         if (eventData.hasOwnProperty(item.from)) {
           eventData[item.to] = eventData[item.from];
         }
       });
       this.replacementProperties[eventType]?.forEach((item) => {
+        // eslint-disable-next-line no-prototype-builtins
         if (eventData.hasOwnProperty(item.from)) {
           eventData[item.to] = eventData[item.from];
           delete eventData[item.from];
         }
       });
-      return serializer.deserialize(eventData, this.deprecatedEventToReplacementEventMap[eventType]);
+      return serializer.deserialize<T>(eventData, this.deprecatedEventToReplacementEventMap[eventType]);
     }
+    return null;
   }
 
-  registerDeprecatedEvent(deprecatedEventType: string, replacementEventType: string) {
+  registerDeprecatedEvent(deprecatedEventType: string, replacementEventType: string): IEventUpcaster {
     this.deprecatedEventToReplacementEventMap[deprecatedEventType] = replacementEventType;
     this.currentDeprecatedEventType = deprecatedEventType;
     return this;
   }
 
-  withReplacePropertiesUpcast(replacementProperties: FromToValuePair[]) {
+  withReplacePropertiesUpcast(replacementProperties: FromToValuePair[]): IEventUpcaster {
     if (!this.currentDeprecatedEventType) {
       throw new Error('No deprecated event type registered');
     }
@@ -69,7 +73,7 @@ export class EventUpcaster implements IEventUpcaster {
     return this;
   }
 
-  withClonePropertiesUpcast(cloneProperties: FromToValuePair[]) {
+  withClonePropertiesUpcast(cloneProperties: FromToValuePair[]): IEventUpcaster {
     if (!this.currentDeprecatedEventType) {
       throw new Error('No deprecated event type registered');
     }
@@ -77,7 +81,7 @@ export class EventUpcaster implements IEventUpcaster {
     return this;
   }
 
-  withCopyPropertyValuesUpcast(copyPropertyValues: FromToValuePair[]) {
+  withCopyPropertyValuesUpcast(copyPropertyValues: FromToValuePair[]): IEventUpcaster {
     if (!this.currentDeprecatedEventType) {
       throw new Error('No deprecated event type registered');
     }

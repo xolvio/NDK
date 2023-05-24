@@ -18,7 +18,7 @@ The key feature of the DDK is allowing you to build an application using the bui
 
 Once you learn  how to use these building blocks, you can build (almost) any backend you can imagine.
 
-This framework has been used to build a number of applications for enterprise clients at [Xolvio](https://www.xolv.io), and we're excited to share it with the world.
+This framework has been used to build a number of applications for enterprise clients at our sister comapny [Xolvio](https://www.xolv.io), and we're excited to share it with the world as the open-source counterpart to our cloud offering at [XSpecs.ai](https://www.xspecs.ai).
 
 ## 🌟 Features
 

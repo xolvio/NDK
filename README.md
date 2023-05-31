@@ -21,13 +21,18 @@ Once you learn how to use these building blocks, you can build (almost) any back
 Some versions of this framework has been used to build a number of applications for enterprise clients at our sister company [Xolvio](https://www.xolv.io), and we're excited to share it with the world as the open-source counterpart to our cloud offering at [XSpecs.ai](https://www.xspecs.ai).
 
 ## 🤔 What is XSpecs.ai?
+
 XSpecs + DDK = Pure Joy. XSpecs provides you with a single source of truth for all your specs, and get this: You can go from Event Storming diagrams to a fully working application in a matter of hours. We've done it, and it's a beautiful thing!
 
-Using the Domain Schema Designer in XSpecs, you can create a visual representation of your domain model. XSpecs will then generate the code for you, and you can use the DDK to build your application. All changes are synced bi-directionally, so you can make changes in XSpecs and have them reflected in your code, and vice versa. 
+Using the Domain Schema Designer in XSpecs, you can create a visual representation of your domain model. XSpecs will then generate the all the scaffolding for you to use with the DDK to build your application. 
 
-XSpecs visualizes any code you write using the DDK using the palette above. This is a great way to get your team on the same page, and to make sure your code is always in sync with your business requirements.
+Along with the boilerplate, XSpecs also does a first pass at coding your business logic, as well as tests using AI. The result is a massive time saving that allows you to focus on decoding complex domains into artful solutions, rather than being a syntax warrior.
 
-Oh btw, XSpecs itself is built using the DDK! 🐶 🥣️ 
+All changes are synced bi-directionally, so you can make changes in XSpecs and have them reflected in your code, and vice versa. You can think of the schema designer as a sort of visual code editor.
+
+XSpecs can also visualize any code you write using the DDK using the palette above. This is a great way to get your whole team – business and technical alike – on the same page, and to make sure your code is always in sync with your business requirements.
+
+Oh btw, XSpecs itself is built using the DDK! 🐶 🥣️
 
 [You can sign up for the beta at the XSpecs website](https://www.xspecs.ai).
 

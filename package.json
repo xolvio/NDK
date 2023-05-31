@@ -10,10 +10,14 @@
     "yarn": ">=1.22.0"
   },
   "scripts": {
-    "test": "jest --coverage",
-    "lint": "eslint .",
-    "type-check": "tsc --noEmit",
-    "format": "prettier --write ."
+    "test:unit": "jest --coverage",
+    "test:lint": "eslint .",
+    "test:types": "tsc --noEmit",
+    "test:format": "prettier --check .",
+    "test": "yarn test:lint && yarn test:types && yarn test:format && yarn test:unit",
+    "fix": "yarn fix:lint && yarn fix:format",
+    "fix:format": "prettier --write .",
+    "fix:lint": "eslint --fix ."
   },
   "packageManager": "yarn@4.0.0-rc.42",
   "devDependencies": {

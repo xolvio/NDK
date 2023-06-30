@@ -4,21 +4,27 @@ import { Event } from './Event';
 import { Ack } from './Ack';
 import { Nack } from './Nack';
 import { NackErrors } from './NackErrors';
-import { Registry } from './Registry';
+import { getClass, Registry } from './Registry';
 import { IReadModel } from './IReadModel';
 import { logger } from './Logger';
 import { IEventHandler } from './IEventHandler';
 
-export class MessageBus<Database> implements IMessageBus<Database> {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  private readonly _allEventHandlers: Function[] = [];
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  private readonly _readModelHandlers: Function[] = [];
-  private _eventHandlerFor: { [key: string]: Function[] } = {};
-  private _commandHandlerFor: { [key: string]: Function } = {};
+type EventHandler = (e: Event) => Promise<void>;
+type CommandHandler = (c: Command) => Promise<string | void>;
+type ReadModelHandler = (e: Event, em: unknown) => Promise<void>;
 
-  _registerEventHandler<T extends Event>(event: new (...args: any[]) => T, handler: (e: T) => Promise<void>): void {
-    logger.debug(`MessageBus:_registerEventHandler ${this.getClass(handler)} for ${event.name}`);
+export class MessageBus<Database> implements IMessageBus<Database> {
+  private readonly _allEventHandlers: EventHandler[] = [];
+  private readonly _readModelHandlers: ReadModelHandler[] = [];
+  private _eventHandlerFor: { [key: string]: EventHandler[] } = {};
+  private _commandHandlerFor: { [key: string]: CommandHandler } = {};
+
+  _registerEventHandler<T extends Event>(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    event: new (...args: any[]) => T,
+    handler: (e: Event) => Promise<void>,
+  ): void {
+    logger.debug(`MessageBus:_registerEventHandler ${getClass(handler)} for ${event.name}`);
     if (event.prototype.getType() === '*') {
       this._allEventHandlers.push(handler);
       return;
@@ -36,11 +42,11 @@ export class MessageBus<Database> implements IMessageBus<Database> {
     if (this._eventHandlerFor[eventName] !== undefined) {
       for await (const handler of this._eventHandlerFor[eventName]) {
         logger.debug(
-          `MessageBus:publish ${event.constructor.name} ${JSON.stringify(event, null, 2)} to ${this.getClass(handler)}`,
+          `MessageBus:publish ${event.constructor.name} ${JSON.stringify(event, null, 2)} to ${getClass(handler)}`,
         );
         await handler(event).catch((e: Error) => {
           logger.error(
-            `MessageBus:publish - Error while publishing to ${this.getClass(handler)}, processing`,
+            `MessageBus:publish - Error while publishing to ${getClass(handler)}, processing`,
             event,
             '\n',
             e,
@@ -52,7 +58,7 @@ export class MessageBus<Database> implements IMessageBus<Database> {
     for await (const handler of this._allEventHandlers) {
       await handler(event).catch((e: Error) => {
         logger.error(
-          `MessageBus:publish_allEventHandlers - Error while publishing to ${this.getClass(handler)}, processing`,
+          `MessageBus:publish_allEventHandlers - Error while publishing to ${getClass(handler)}, processing`,
           event,
           '\n',
           e,
@@ -66,10 +72,15 @@ export class MessageBus<Database> implements IMessageBus<Database> {
     Registry.getInstance().registerCommandHandlerInstance(commandHandler, this);
   }
 
-  registerCommandHandler<T extends Command>(command: new (...args: any[]) => T, handler: (e: T) => Promise<string | void>): void {
+  registerCommandHandler<T extends Command>(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    command: new (...args: any[]) => T,
+    handler: (c: Command) => Promise<string | void>,
+  ): void {
     // registerCommandHandler(command: new (...args: any[]) => Command, handler: Function): void {
-    logger.debug(`MessageBus:registerCommandHandler ${this.getClass(handler)} for ${command.name}`);
+    logger.debug(`MessageBus:registerCommandHandler ${getClass(handler)} for ${command.name}`);
     const commandName = command.name;
+    // (c: Command) => Promise<void>;
     this._commandHandlerFor[commandName] = handler;
   }
 
@@ -80,9 +91,9 @@ export class MessageBus<Database> implements IMessageBus<Database> {
       return new Nack(NackErrors.CommandHandlerNotFound);
     }
     logger.debug(
-      `MessageBus:send sending ${commandName} ${JSON.stringify(command, null, 2)} to ${
-        this.getClass(this._commandHandlerFor[commandName])
-      }`,
+      `MessageBus:send sending ${commandName} ${JSON.stringify(command, null, 2)} to ${getClass(
+        this._commandHandlerFor[commandName],
+      )}`,
     );
     try {
       const res = await this._commandHandlerFor[commandName](command);
@@ -90,7 +101,7 @@ export class MessageBus<Database> implements IMessageBus<Database> {
       return new Nack(res);
     } catch (e) {
       logger.error(
-        `MessageBus:send - Error while executing ${this.getClass(this._commandHandlerFor[commandName])} processing`,
+        `MessageBus:send - Error while executing ${getClass(this._commandHandlerFor[commandName])} processing`,
         command,
         '\n',
         e,
@@ -104,8 +115,8 @@ export class MessageBus<Database> implements IMessageBus<Database> {
     return this.send(command);
   }
 
-  _registerReadModel(handler: any): void {
-    logger.debug(`MessageBus:_registerReadModel ${this.getClass(handler)}`);
+  _registerReadModel(handler: EventHandler): void {
+    logger.debug(`MessageBus:_registerReadModel ${getClass(handler)}`);
     this._readModelHandlers.push(handler);
   }
 
@@ -117,7 +128,7 @@ export class MessageBus<Database> implements IMessageBus<Database> {
   async updateReadModels<T extends Event>(event: T, em: Database): Promise<void> {
     for await (const handler of this._readModelHandlers) {
       logger.debug(
-        `MessageBus:updateReadModels - Updating ${this.getClass(handler)} with ${event.constructor.name} ${JSON.stringify(
+        `MessageBus:updateReadModels - Updating ${getClass(handler)} with ${event.constructor.name} ${JSON.stringify(
           event,
           null,
           2,
@@ -125,7 +136,7 @@ export class MessageBus<Database> implements IMessageBus<Database> {
       );
       await handler(event, em).catch((e: Error) => {
         logger.error(
-          `MessageBus:updateReadModels - Error while updating read model ${this.getClass(handler)}, processing`,
+          `MessageBus:updateReadModels - Error while updating read model ${getClass(handler)}, processing`,
           event,
           '\n',
           e,
@@ -133,10 +144,5 @@ export class MessageBus<Database> implements IMessageBus<Database> {
         throw e;
       });
     }
-  }
-
-  private getClass(handler: Function) {
-    // @ts-ignore
-    return handler['clazz'];
   }
 }

@@ -3,14 +3,18 @@ import { Event } from './Event';
 import { Ack } from './Ack';
 import { Nack } from './Nack';
 import { IReadModel } from './IReadModel';
+import { IEventHandler } from './IEventHandler';
 
 export interface IMessageBus<Database> {
-  // registerEventHandler: <T extends Event>(event: any, handler: (e: T) => Promise<void>) => void;
-  registerEventHandler: (handlers: any) => void;
+  registerEventHandler(eventHandler: IEventHandler<unknown>): void;
 
-  publish: <T extends Event>(event: T) => Promise<void>;
+  publish<T extends Event>(event: T): Promise<void>;
 
-  registerCommandHandler<T extends Command>(command: new (...args: any[]) => T, handler: (e: T) => Promise<void>): void;
+  registerCommandHandler<T extends Command>(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    command: new (...args: any[]) => T,
+    handler: (c: Command) => Promise<string | void>,
+  ): void;
 
   send: <T extends Command>(command: T) => Promise<Ack | Nack>;
 

@@ -1,5 +1,4 @@
 import { IEventHandler } from './IEventHandler';
 
-export interface IPolicy extends IEventHandler<unknown> {
-}
-
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface IPolicy extends IEventHandler<unknown> {}

@@ -2,36 +2,39 @@ import { Serializable, Serializer } from './Serializer';
 import { logger } from './Logger';
 
 class Foo {
-  foo: string = '';
+  foo = '';
 }
 
 describe('Serializer', () => {
   describe('Serializable decorator', () => {
-    it('should register decorated classes as types', () => {});
-    @Serializable
-    class MyClass {
-      constructor(public readonly name: string) {}
-    }
+    it('should register decorated classes as types', () => {
+      @Serializable
+      class MyClass {
+        constructor(public readonly name: string) {}
+      }
 
-    const myClass = new Serializer().deserialize({ name: 'hey!' }, 'MyClass');
+      const myClass = new Serializer().deserialize<MyClass>({ name: 'hey!' }, 'MyClass');
 
-    expect(myClass instanceof MyClass).toEqual(true);
-    expect(myClass.name).toEqual('hey!');
+      if (myClass === null) throw new Error('myClass is null');
+
+      expect(myClass instanceof MyClass).toEqual(true);
+      expect(myClass.name).toEqual('hey!');
+    });
   });
   describe('serialize & deserialize', () => {
     it('should serialize an object', async () => {
       class Foo {
         constructor(public readonly name: string) {}
       }
+
       const f = new Foo('bar');
       const serializer = new Serializer();
-      const serialized = serializer.serialize(f)
+      const serialized = serializer.serialize(f);
       expect(serialized).toEqual({ name: 'bar' });
-
     });
     it('should deserialize known types', () => {
       const serializer = new Serializer();
-      serializer.registerType(Foo);
+      serializer.registerType<Foo>(Foo);
       const data = { foo: 'bar' };
 
       const result = serializer.deserialize(data, 'Foo');

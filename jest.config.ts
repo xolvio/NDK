@@ -1,5 +1,5 @@
-import type {Config} from 'jest';
-import {defaults} from 'jest-config';
+import type { Config } from 'jest';
+import { defaults } from 'jest-config';
 
 const config: Config = {
   moduleFileExtensions: [...defaults.moduleFileExtensions, 'mts'],
@@ -16,7 +16,15 @@ const config: Config = {
         warnOnly: false,
       },
     ],
-  }
+  },
+  coverageThreshold: {
+    global: {
+      branches: 100,
+      functions: 100,
+      lines: 100,
+      statements: 100,
+    },
+  },
 };
 
 export default config;

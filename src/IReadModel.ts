@@ -1,4 +1,4 @@
 import { IEventHandler } from './IEventHandler';
 
-export interface IReadModel<Database> extends IEventHandler<Database> {
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface IReadModel<Database> extends IEventHandler<Database> {}

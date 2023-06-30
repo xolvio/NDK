@@ -6,7 +6,6 @@ import { NackErrors } from './NackErrors';
 import { Nack } from './Nack';
 import { IReadModel } from './IReadModel';
 import { Ack } from './Ack';
-import { EventHandlerArgs } from './IEventHandler';
 
 class FooCommand extends Command {
   constructor(id: string) {
@@ -36,6 +35,7 @@ class BarEvent extends Event {
 
 class MyReadModel implements IReadModel<unknown> {
   async handle(): Promise<void> {
+    // empty for testing
   }
 }
 
@@ -80,9 +80,11 @@ describe('MessageBus', () => {
       const messageBus = new MessageBus();
       // messageBus.registerEventHandler();
       const eventHandler = {
-        handle: async (_eventHandlerArgs: EventHandlerArgs): Promise<void> => {}
-      }
-      messageBus.registerEventHandler(eventHandler)
+        handle: async (): Promise<void> => {
+          // empty for testing
+        },
+      };
+      messageBus.registerEventHandler(eventHandler);
       expect(registry.registerEventHandlerInstance).toHaveBeenCalledWith(eventHandler, messageBus);
     });
   });
@@ -155,6 +157,7 @@ describe('MessageBus', () => {
     it('should warn when there are no command handlers', async () => {
       const messageBus = new MessageBus();
       const warn = jest.spyOn(console, 'warn').mockImplementation(() => {
+        // empty for testing
       });
       const res = (await messageBus.send(new FooCommand('1'))) as Nack;
       expect(res.errorCode).toEqual(NackErrors.CommandHandlerNotFound);
@@ -163,6 +166,7 @@ describe('MessageBus', () => {
     it('should return an ACK when there are no errors from command handlers', async () => {
       const messageBus = new MessageBus();
       const handler = async () => {
+        // empty for testing
       };
       messageBus.registerCommandHandler(FooCommand, handler);
       const res = (await messageBus.send(new FooCommand('1'))) as Nack;
@@ -177,7 +181,7 @@ describe('MessageBus', () => {
     });
     it('should return a NACK when the command handler returns an error message', async () => {
       const messageBus = new MessageBus();
-      const handler = async (_c: Command) => 'Some error occurred';
+      const handler = async () => 'Some error occurred';
       messageBus.registerCommandHandler(FooCommand, handler);
 
       const res = (await messageBus.send(new FooCommand('1'))) as Nack;

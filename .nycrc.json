@@ -1,0 +1,14 @@
+{
+  "require": ["tsconfig-paths/register"],
+  "cwd": ".",
+  "all": true,
+  "reporter": ["lcovonly", "json", "html"],
+  "temp-dir": "coverage/.nyc_output",
+  "include": ["**/*.ts"],
+  "per-file": false,
+  "statements": 100,
+  "branches": 100,
+  "functions": 100,
+  "lines": 100,
+  "exclude": ["*.*", "**/I[A-Z]*.ts", "**/*.specs.ts"]
+}

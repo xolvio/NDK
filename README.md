@@ -76,4 +76,11 @@ Contributions are always welcome! Feel free to open issues and pull requests. We
 
 We have a very high bar for automated testing set at a 100% coverage threshold. If you find we've somehow missed any tests, please open an issue, and we'll get it fixed as soon as possible.
 
+Please make sure you are familiar with:
+
+* Writing [good commit messages](https://twitter.com/dmokafa/status/1351152452179996682)
+* Keeping the [commit history clean and tidy](https://www.eficode.com/blog/keep-your-git-commits-clean)
+* [Commitizen](https://commitizen-tools.github.io/commitizen/)
+* [Semantic Release](https://semantic-release.gitbook.io/semantic-release/)
+
 📖 "Code is read much more often than it is written, so plan accordingly." - Anonymous

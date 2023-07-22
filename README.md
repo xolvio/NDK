@@ -1,12 +1,12 @@
 # 🚀 The Domain Development Kit (DDK)
 
-_An Event-Storm to Event-Sourced application framework_
+_An Event-Storm to Event-Sourced application library_
 
-Welcome to The Domain Development Kit (DDK), a lightweight application framework designed to take you from visual collaborative Event Storming sessions to an Event-Sourced application seamlessly. This is a framework for developers looking to build complex systems with a strong emphasis on separating concerns and focusing on the business logic.
+Welcome to The Domain Development Kit (DDK), a lightweight application library (not framework) designed to take you from visual collaborative Event Storming sessions to an Event-Sourced application seamlessly. This is a library for developers looking to build complex systems with a strong emphasis on separating concerns and focusing on the business logic.
 
 The key feature of the DDK is allowing you to build an application using the building blocks shown in this diagram:
 
-![DDK Palette](images/palette.png)
+![DDK Palette](images/palette.jpg)
 
 - Commands
 - Aggregates
@@ -18,7 +18,7 @@ The key feature of the DDK is allowing you to build an application using the bui
 
 Once you learn how to use these building blocks, you can build (almost) any backend you can imagine.
 
-Some versions of this framework has been used to build a number of applications for enterprise clients at our sister company [Xolvio](https://www.xolv.io), and we're excited to share it with the world as the open-source counterpart to our cloud offering at [XSpecs.ai](https://www.xspecs.ai).
+Some versions of this library has been used to build a number of applications for enterprise clients at our sister company [Xolvio](https://www.xolv.io), and we're excited to share it with the world as the open-source counterpart to our cloud offering at [XSpecs.ai](https://www.xspecs.ai).
 
 ## 🤔 What is XSpecs.ai?
 

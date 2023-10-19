@@ -1,6 +1,6 @@
 # 🚀 The Domain Development Kit (DDK)
 
-_An Event-Storm to Event-Sourced application library_
+_An Event-Storm to Event-Sourced application library._
 
 Welcome to The Domain Development Kit (DDK), a lightweight application library (not framework) designed to take you from visual collaborative Event Storming sessions to an Event-Sourced application seamlessly. This is a library for developers looking to build complex systems with a strong emphasis on separating concerns and focusing on the business logic.
 
@@ -8,23 +8,35 @@ The key feature of the DDK is allowing you to build an application using the bui
 
 ![DDK Palette](images/palette.jpg)
 
-- Commands
-- Aggregates
-- Sagas
-- External Systems (In/Out)
-- Events
-- Read Models
-- Policies
+- **Messages** _allow the constructs below to communicate with one another._
+  - Commands
+  - Events
+- **Constraints** _enforce business rules and determine if events are allowed to happen._
+  - Aggregate Roots
+  - Aggregates
+  - External Systems
+- **Processes** _deal with orchestration in response to commands and events._
+  - Services
+  - Policies
+  - Sagas
+- **Data Retrieval** _constructs ensure efficient data access and usage._
+  - Read Models
+  - Resolvers
+  - Queries
+- **Interaction** _allows external actors to interact with the system._
+  - API
+  - UI
 
-Once you learn how to use these building blocks, you can build (almost) any backend you can imagine.
+Once you master these building blocks, you'll be able to build (almost) any internet-scale backend.
 
-Some versions of this library has been used to build a number of applications for enterprise clients at our sister company [Xolvio](https://www.xolv.io), and we're excited to share it with the world as the open-source counterpart to our cloud offering at [XSpecs.ai](https://www.xspecs.ai).
+Some versions of this library have been used to build a number of applications for enterprise clients at our sister company Xolvio.
+We're excited to share it with the world as the open-source counterpart to our cloud offering at [XSpecs.ai](https://www.xspecs.ai).
 
 ## 🤔 What is XSpecs.ai?
 
 XSpecs + DDK = Pure Joy. XSpecs provides you with a single source of truth for all your specs, and get this: You can go from Event Storming diagrams to a fully working application in a matter of hours. We've done it, and it's a beautiful thing!
 
-Using the Domain Schema Designer in XSpecs, you can create a visual representation of your domain model. XSpecs will then generate the all the scaffolding for you to use with the DDK to build your application.
+Using the Domain Schema Designer in XSpecs, you can create a visual representation of your domain model. XSpecs will then generate all the scaffolding for you to use with the DDK to build your application.
 
 Along with the boilerplate, XSpecs also does a first pass at coding your business logic, as well as tests using AI. The result is a massive time saving that allows you to focus on decoding complex domains into artful solutions, rather than being a syntax warrior.
 
@@ -40,7 +52,7 @@ Oh btw, XSpecs itself is built using the DDK! 🐶 🥣️
 
 - **Event Sourcing and CQRS**: DDK encapsulates the complexity of implementing an Event-Sourcing architecture and Command Query Responsibility Segregation (CQRS) in your applications.
 - **Decorator-based Command and Event Handlers**: Easily register and handle commands and events using a declarative and intuitive decorator-based approach.
-- **Read Model Management**: DDK manages Read Models and their handlers, ensuring efficient handling of domain-specific views of your data.
+- **Read Model Management**: DDK manages Read Models and their handlers, ensuring efficient handling of domain-specific data views.
 - **Serialization**: DDK comes with a built-in Serializer class that allows developers to serialize and deserialize domain events into a form that can be stored and retrieved.
 
 ## 🔑 Key Components
@@ -59,7 +71,7 @@ More detailed documentation about specific modules, usage examples, and advanced
 
 ## 🚀 Getting Started on DDK development
 
-_For building apps using the DDK please refer to our documentation_
+_For building apps using the DDK, please refer to our documentation_
 
 1. Clone the repository.
 2. Install dependencies with `yarn install`.
@@ -83,4 +95,4 @@ Please make sure you are familiar with:
 - [Commitizen](https://commitizen-tools.github.io/commitizen/)
 - [Semantic Release](https://semantic-release.gitbook.io/semantic-release/)
 
-📖 "Code is read much more often than it is written, so plan accordingly." - Anonymous
+📖 "Code is read much more often than it is written, so plan accordingly." — Anonymous

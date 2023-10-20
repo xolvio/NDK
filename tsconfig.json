@@ -1,4 +1,7 @@
 {
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  },
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "alwaysStrict": true,
@@ -17,7 +20,6 @@
     "pretty": true,
     "removeComments": true,
     "resolveJsonModule": true,
-    "rootDir": "src",
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
@@ -27,5 +29,5 @@
     "target": "es2020",
     "types": ["node", "jest"]
   },
-  "include": ["./src/**/*.ts"]
+  "include": ["**/src/**/*.ts"]
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@xspecs/ddk",
+  "private": true,
   "version": "1.0.0",
   "repository": {
     "type": "git",
@@ -11,7 +11,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "homepage": "https://github.com/XSpecs/ddk#readme",
-  "author": "Sam Hatoum <sam@xspecs.io>",
+  "author": "Sam Hatoum <sam@xspecs.iai>",
   "license": "Elastic License 2.0",
   "engines": {
     "node": ">=18.0.0",
@@ -24,20 +24,21 @@
   "packageManager": "yarn@3.6.1",
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
+    "build-": "yarn workspaces run build",
     "commit": "git-cz",
     "fix": "yarn fix:lint && yarn fix:format",
     "fix:format": "echo Fixing formatting && prettier --write . --loglevel silent",
     "fix:lint": "eslint --fix .",
-    "release": "semantic-release",
-    "release-local": "env $(cat .env | grep -v \"#\" | xargs) semantic-release",
-    "test": "yarn test:lint && yarn test:types && yarn test:format && yarn test:unit",
-    "test:format": "echo Checking formatting && prettier --check . --loglevel silent",
-    "test:lint": "eslint .",
-    "test:types": "tsc --noEmit",
-    "test:unit": "jest --coverage",
     "postinstall": "husky install",
+    "postpack": "pinst --enable",
     "prepack": "pinst --disable",
-    "postpack": "pinst --enable"
+    "release": "semantic-release",
+    "release:local": "env $(cat .env | grep -v \"#\" | xargs) semantic-release",
+    "test": "yarn test:lint && yarn test:types && yarn test:format && yarn test:unit",
+    "test:format": "echo Format check && prettier --check . --loglevel silent",
+    "test:lint": "echo Lint check && eslint .",
+    "test:types": "echo Type check && tsc --noEmit",
+    "test:unit": "echo Unit tests && jest --coverage"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
@@ -64,8 +65,12 @@
     "semantic-release": "^21.0.6",
     "semantic-release-yarn": "^2.0.0",
     "testdouble": "^3.18.0",
+    "tsconfig-paths": "^4.2.0",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

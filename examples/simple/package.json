@@ -1,0 +1,15 @@
+{
+  "name": "@ddk/simple-example",
+  "version": "1.0.0",
+  "description": "Simple",
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ddk/core": "*",
+    "@ddk/graphql": "*"
+  },
+  "devDependencies": {
+    "@ddk/cli": "*"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "@ddk/test-app",
+  "dependencies": {
+    "@ddk/core": "*",
+    "@ddk/event-store-db": "*",
+    "type-graphql": "^2.0.0-beta.3"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "*",
+    "@ddk/cli": "*"
+  }
+}

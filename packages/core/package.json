@@ -1,9 +1,8 @@
 {
-  "name": "@xspecs/ddk-core",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {}
+  "name": "@ddk/core",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  }
 }

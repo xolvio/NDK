@@ -1,7 +1,7 @@
 import { IEventStore } from './IEventStore';
 import { IRepository } from './IRepository';
 import { AggregateRoot } from './AggregateRoot';
-import { logger } from './Logger';
+import { logger } from '../../logger-console/src/Logger';
 
 export class Repository<T extends AggregateRoot> implements IRepository<T> {
   constructor(private readonly _storage: IEventStore, private readonly Type: new (id: string) => T) {}

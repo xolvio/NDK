@@ -1,0 +1,14 @@
+{
+  "name": "@ddk/cli",
+  "version": "1.0.0",
+  "description": "Local runtime for DDK",
+  "bin": {
+    "ddk": "./src/index.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "ts-morph": "^20.0.0"
+  }
+}

@@ -19,6 +19,7 @@
     "outDir": "dist",
     "pretty": true,
     "removeComments": true,
+    "baseUrl": "./",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
@@ -27,7 +28,14 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "target": "es2020",
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    "paths": {
+      "@ddk/api-graphql-apollo": ["packages/api-graphql-apollo/src"],
+      "@ddk/core": ["packages/core/src"]
+    }
   },
-  "include": ["**/src/**/*.ts"]
+  "include": [
+    "packages/api-graphql-apollo/src",
+    "packages/core/src"
+  ]
 }

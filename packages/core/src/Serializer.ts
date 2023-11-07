@@ -1,4 +1,4 @@
-import { logger } from './Logger';
+import { logger } from '../../logger-console/src/Logger';
 
 declare let global: {
   ___serializerTypes: { [key: string]: object };

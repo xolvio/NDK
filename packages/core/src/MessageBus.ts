@@ -6,7 +6,7 @@ import { Nack } from './Nack';
 import { NackErrors } from './NackErrors';
 import { getClass, Registry } from './Registry';
 import { IReadModel } from './IReadModel';
-import { logger } from './Logger';
+import { logger } from '../../logger-console/src/Logger';
 import { IEventHandler } from './IEventHandler';
 
 type EventHandler = (e: Event) => Promise<void>;
@@ -72,6 +72,7 @@ export class MessageBus<Database> implements IMessageBus<Database> {
     Registry.getInstance().registerCommandHandlerInstance(commandHandler, this);
   }
 
+  // TODO fail when a command is handled more than once
   registerCommandHandler<T extends Command>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     command: new (...args: any[]) => T,

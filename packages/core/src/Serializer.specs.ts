@@ -1,5 +1,5 @@
 import { Serializable, Serializer } from './Serializer';
-import { logger } from './Logger';
+import { logger } from '../../logger-console/src/Logger';
 
 class Foo {
   foo = '';

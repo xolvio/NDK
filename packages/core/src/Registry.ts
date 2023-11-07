@@ -1,4 +1,5 @@
-import { Command, Event, IMessageBus, IReadModel, Message, MessageBus } from '.';
+import { AggregateRoot, Command, Event, IMessageBus, IReadModel, Message, MessageBus } from '.';
+import { IProcess } from './IProcess';
 
 export class ANY extends Event {
   public constructor() {
@@ -11,7 +12,7 @@ export class ANY extends Event {
 }
 
 export function getClass<T>(object: T): string {
-  // @ts-ignore
+  // @ts-ignores
   return object['clazz'];
 }
 
@@ -96,9 +97,30 @@ export class CATCHUP extends Event {
   }
 }
 
+export interface Decorator {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  <TFunction extends Function>(target: TFunction): TFunction | void;
+
+  <T>(
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    target: Object,
+    propertyKey: string | symbol,
+    descriptor: TypedPropertyDescriptor<T>,
+  ): TypedPropertyDescriptor<T> | void;
+
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  (target: Object, propertyKey: string | symbol): void;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function Handles<M extends Message>(message: new (...args: any[]) => M) {
+type MessageType<M> = new (...args: any[]) => M;
+type HandlesArgs<M> = MessageType<M> | MessageType<M>[];
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function Handles<M extends Message>(m: HandlesArgs<M>): Decorator {
   return function (target: object, _propertyKey: string, descriptor: PropertyDescriptor): void {
+    // TODO make this handle arrays of events (but not commands?)
+    const message = m as MessageType<M>;
     const registry = Registry.getInstance();
     if (message.name === CATCHUP.name) {
       if (!registry.readModelHandlers[target.constructor.name])
@@ -115,5 +137,45 @@ export function Handles<M extends Message>(message: new (...args: any[]) => M) {
       if (!registry.eventHandlers[target.constructor.name]) registry.eventHandlers[target.constructor.name] = {};
       registry.eventHandlers[target.constructor.name][event.name] = { event, handler: descriptor.value };
     }
+  } as Decorator;
+}
+
+export function StartedBy<M extends Message>(m: HandlesArgs<M>): Decorator {
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return function (target: object, _propertyKey: string, descriptor: PropertyDescriptor): void {
+    // eslint-disable-next-line no-console
+    console.log('StartedBy', m);
+  } as Decorator;
+}
+
+export enum HandlerStrategy {
+  CREATE = 'CREATE',
+  LOAD = 'LOAD',
+}
+
+interface AggregateHandlerConfig {
+  strategy: HandlerStrategy;
+}
+
+interface ProcessHandlerConfig {
+  process: string;
+  strategy?: void;
+}
+
+type HandlerConfig = AggregateHandlerConfig | ProcessHandlerConfig;
+
+export function Handler<T extends AggregateRoot | IProcess>(
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+  construct: new (...args: any[]) => T,
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+  config?: HandlerConfig<T>,
+) {
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+  return function (constructor: { new (...args: any[]): any }): void {
+    // empty
   };
 }

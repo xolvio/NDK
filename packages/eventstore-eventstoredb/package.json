@@ -1,0 +1,12 @@
+{
+  "name": "@ddk/event-store-db",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ddk/core": "*",
+    "@eventstore/db-client": "6.0.0 "
+  }
+}

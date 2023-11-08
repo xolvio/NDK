@@ -13,7 +13,7 @@ export class AddRecipeCommand extends Command {
   @Field(() => String, { nullable: true })
   public readonly description?: string;
 
-  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'noneassssss')
+  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'none')
   public readonly user: string;
 
   constructor(title: string, description: string | undefined, user: string) {

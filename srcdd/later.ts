@@ -1,11 +1,4 @@
-import {
-  Event,
-  Handler,
-  HandlerStrategy,
-  Handles,
-  Message,
-  StartedBy,
-} from '@ddk/core';
+import { Event, Handler, HandlerStrategy, Handles, Message, StartedBy } from '@ddk/core';
 import { Field, InputType } from '@ddk/graphql';
 import { StatefulProcess } from '@ddk/core/src/StatefulProcess';
 

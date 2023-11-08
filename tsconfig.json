@@ -8,6 +8,7 @@
     "declaration": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["ES2020"],
     "module": "CommonJS",

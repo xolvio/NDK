@@ -13,7 +13,7 @@ export class AddRecipeCommand extends Command {
   @Field(() => String, { nullable: true })
   public readonly description?: string;
 
-  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'noneassssss')
+  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'none')
   public readonly user: string;
 
   constructor(title: string, description: string | undefined, user: string) {
@@ -24,7 +24,9 @@ export class AddRecipeCommand extends Command {
   }
 
   async handle(): Promise<boolean> {
-    const data = structuredClone(this) as unknown as Record<string, number | string> | string;
+    const data = structuredClone(this) as unknown as
+      | Record<string, number | string>
+      | string;
     const recipe = Object.assign(Object.create(Recipe), data);
     // await em.persist(recipe).flush();
     return recipe !== null;
@@ -38,7 +40,7 @@ export class DeleteRecipeCommand extends Command {
   @Field(() => String)
   public readonly title: string;
 
-  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'foo')
+  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'none')
   public readonly userId: string;
 
   constructor(title: string, userId: string) {

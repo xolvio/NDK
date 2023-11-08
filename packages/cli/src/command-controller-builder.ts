@@ -1,13 +1,8 @@
-import {
-  ClassDeclaration,
-  ImportDeclaration,
-  MethodDeclaration,
-  Project,
-  Scope,
-  SourceFile,
-  SyntaxKind,
-} from 'ts-morph';
+import { ClassDeclaration, ImportDeclaration, Project, QuoteKind, Scope, SourceFile, SyntaxKind } from 'ts-morph';
 import { HandlerStrategy as HandlerStrategyOG } from '@ddk/core';
+// import { rm } from 'fs/promises';
+import path from 'path';
+import prettier from 'prettier';
 
 export function findCommands(project: Project): ClassDeclaration[] {
   return project
@@ -22,6 +17,10 @@ function decapFirstLetter(text: string) {
 
 function removeStringFromText(text: string, str: string): string {
   return text.replace(str, '');
+}
+
+function camelToKebabCase(str: string): string {
+  return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
 function isAuthorizedDecoratorPresent(classDeclaration: ClassDeclaration): boolean {
@@ -112,14 +111,18 @@ export function createCommandHandler(commandClass: ClassDeclaration, commandHand
   return commandHandlerSourceFile;
 }
 
-export function createCommandController(
-  commandClass: ClassDeclaration,
-  commandControllerSourceFile: SourceFile,
-): MethodDeclaration {
+export async function createCommandController(project: Project, commandClass: ClassDeclaration): Promise<void> {
   const className = commandClass.getNameOrThrow();
   const commandProperties = commandClass.getProperties();
   const mutationName = decapFirstLetter(removeStringFromText(className, 'Command'));
 
+  const commandControllerSourceFile = project.createSourceFile(
+    `src/.command-controllers/${camelToKebabCase(commandClass.getNameOrThrow())}-controller.ts`,
+    '',
+    {
+      overwrite: true,
+    },
+  );
   // FIXME how do we know if we need to import Arg, Authorized, Ctx, ID, Mutation, Resolver?
   commandControllerSourceFile.addImportDeclaration({
     namedImports: ['Arg', 'Authorized', 'Ctx', 'Mutation', 'Resolver'],
@@ -177,7 +180,8 @@ export function createCommandController(
     if (Object.keys(contextParamMethods).length > 0) {
       commandControllerSourceFile.addImportDeclaration({
         namedImports: ['Context'],
-        moduleSpecifier: './context',
+        // FIXME this should be extracted from the command file, both the type and the location of the file
+        moduleSpecifier: '../context',
       });
     }
   });
@@ -204,16 +208,68 @@ export function createCommandController(
     .join(', ');
 
   resolverMethod.setBodyText(`console.log('messageBus.send', new ${className}(${commandArgs}));\nreturn true;`);
-  return resolverMethod;
+  await saveFile(commandControllerSourceFile);
 }
 
-export function createCommandControllers(project: Project): void {
+export async function createCommandControllers(project: Project): Promise<void> {
   const commandClasses = findCommands(project);
-  project.createDirectory('build/command-controllers');
-  commandClasses.forEach((commandClass) => {
-    const sourceFile = project.createSourceFile('build/command-controllers/resolver.ts', '', { overwrite: true });
-    const c = createCommandController(commandClass, sourceFile);
-    // eslint-disable-next-line no-console
-    console.log(c.getSourceFile().getText());
+  for (const commandClass of commandClasses) {
+    await createCommandController(project, commandClass);
+  }
+}
+
+export function loadProject(project: Project, basePath = ''): Project {
+  project.addSourceFilesAtPaths([path.join(basePath, '**/*.ts'), path.join(basePath, '!**/*.d.ts')]);
+  return project;
+}
+
+export function reloadProjectFiles(project: Project, changedFilePaths: string[]): Project {
+  changedFilePaths.forEach((filePath) => {
+    const sourceFile = project.getSourceFile(filePath);
+    if (sourceFile) project.removeSourceFile(sourceFile);
+    project.addSourceFileAtPath(filePath);
   });
+  return project;
+}
+
+function prepareProject(project: Project) {
+  project.createDirectory('src/.command-controllers');
+}
+
+// async function deleteBuildDirectory() {
+//   await rm(path.join(process.cwd(), 'src/.command-controllers'), { recursive: true, force: true });
+// }
+
+let count = 0;
+
+async function saveFile(file: SourceFile): Promise<void> {
+  const formattedCode = prettier.format(file.getFullText(), {
+    parser: 'typescript',
+    singleQuote: true,
+  });
+  file.replaceWithText(formattedCode + `\n//${count++}`);
+  await file.save();
+}
+
+export class Builder {
+  project: Project = new Project();
+
+  constructor() {
+    this.project.manipulationSettings.set({
+      quoteKind: QuoteKind.Single,
+    });
+    loadProject(this.project);
+  }
+
+  async build(changedPaths: string[]): Promise<void> {
+    try {
+      // await deleteBuildDirectory();
+      reloadProjectFiles(this.project, changedPaths);
+      prepareProject(this.project);
+      await createCommandControllers(this.project);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+    }
+  }
 }

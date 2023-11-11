@@ -29,7 +29,7 @@ export class ConsoleTools {
   updateConsole(message: string): ConsoleTools {
     readline.cursorTo(process.stdout, 0);
     readline.clearLine(process.stdout, 0);
-    process.stdout.write(message);
+    process.stdout.write('d\n' + message);
     return this;
   }
 

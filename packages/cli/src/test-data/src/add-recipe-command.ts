@@ -1,7 +1,7 @@
 import { AggregateRoot, Command, Handler, HandlerStrategy } from '@ddk/core';
 import { ID, Authorized, Ctx, Field, InputType } from '@ddk/graphql';
-import { Context } from './context';
-import { Recipe } from './recipe';
+import { Context } from './deps/context';
+import { Recipe } from './deps/recipe';
 
 @Authorized()
 @InputType()

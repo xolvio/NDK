@@ -204,13 +204,5 @@ function convertCommandToEvent(command: string): string {
 // Examples
 // eslint-disable-next-line no-console
 console.log(`  
-${convertCommandToEvent('SendUserEmailCommand')}
-${convertCommandToEvent('CreateDocumentCommand')}
-${convertCommandToEvent('AddUserCommand')}
-${convertCommandToEvent('RetrieveDocumentFromStorageCommand')}
-${convertCommandToEvent('SendEmailNotificationCommand')}
-${convertCommandToEvent('BeginTransactionCommand')}
-${convertCommandToEvent('CreateUserAccountCommand')}
-${convertCommandToEvent('SetUpAccountCommand')}
-${convertCommandToEvent('SetupAccountCommand')}
+${convertCommandToEvent('SetupTelevisionCommand')}
 `);

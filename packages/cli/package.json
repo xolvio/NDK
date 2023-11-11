@@ -9,7 +9,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@ddk/graphql": "*"
+    "@ddk/graphql": "*",
+    "kleur": "^4.1.5"
   },
   "devDependencies": {
     "@parcel/watcher": "^2.3.0",

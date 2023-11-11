@@ -1,12 +1,4 @@
-import {
-  Authorized,
-  Field,
-  Float,
-  Int,
-  ObjectType,
-  Query,
-  Resolver,
-} from '@ddk/graphql';
+import { Authorized, Field, Float, Int, ObjectType, Query, Resolver } from '@ddk/graphql';
 
 @ObjectType()
 export class Recipe {

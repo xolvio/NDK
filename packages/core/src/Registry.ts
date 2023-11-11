@@ -127,7 +127,7 @@ export function Handles<M extends Message>(m: HandlesArgs<M>): Decorator {
         registry.readModelHandlers[target.constructor.name] = descriptor.value;
     }
     if (message.prototype instanceof Command) {
-      const command = message as new (...args: unknown[]) => Command;
+      const command = message as unknown as new (...args: unknown[]) => Command;
       if (!registry.commandHandlers[target.constructor.name]) registry.commandHandlers[target.constructor.name] = {};
       registry.commandHandlers[target.constructor.name][command.name] = { command, handler: descriptor.value };
     }

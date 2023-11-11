@@ -27,19 +27,87 @@ function isAuthorizedDecoratorPresent(classDeclaration: ClassDeclaration): boole
   return classDeclaration.getDecorators().some((decorator) => decorator.getName() === 'Authorized');
 }
 
-export function createCommandHandler(commandClass: ClassDeclaration, commandHandlerSourceFile: SourceFile): SourceFile {
+function handleImports(commandClass: ClassDeclaration, commandControllerSourceFile: SourceFile, className: string) {
+  commandControllerSourceFile.addImportDeclaration({
+    namedImports: ['Arg', 'Authorized', 'Ctx', 'Mutation', 'Resolver'],
+    moduleSpecifier: '@ddk/graphql',
+  });
+  commandClass
+    .getSourceFile()
+    .getImportDeclarations()
+    .forEach((importDeclaration) => {
+      const importDeclarationModuleSpecifierValue = importDeclaration.getModuleSpecifierValue();
+
+      // ignore imports of @ddk/core and @ddk/graphql since the command controller will import its own deps from here
+      if (['@ddk/core', '@ddk/graphql'].indexOf(importDeclarationModuleSpecifierValue) !== -1) return;
+
+      // ignore imports of classes that extend AggregateRoot
+      if (
+        importDeclaration
+          .getModuleSpecifierSourceFileOrThrow()
+          .getClasses()
+          .find((c) => c.getExtends()?.getText() === 'AggregateRoot')
+      )
+        return;
+
+      const path =
+        importDeclarationModuleSpecifierValue.charAt(0) === '@'
+          ? importDeclaration.getModuleSpecifierValue()
+          : commandControllerSourceFile.getRelativePathAsModuleSpecifierTo(
+              importDeclaration.getModuleSpecifierSourceFileOrThrow().getFilePath(),
+            );
+
+      // Check for default import
+      const defaultImport = importDeclaration.getDefaultImport();
+      if (defaultImport) {
+        commandControllerSourceFile.addImportDeclaration({
+          moduleSpecifier: path,
+          defaultImport: defaultImport.getText(),
+        });
+      }
+
+      // Check for named imports
+      const namedImports = importDeclaration.getNamedImports().map((ni) => ni.getName());
+      if (namedImports.length > 0) {
+        commandControllerSourceFile.addImportDeclaration({
+          moduleSpecifier: path,
+          namedImports,
+        });
+      }
+    });
+
+  commandControllerSourceFile.addImportDeclaration({
+    namedImports: [className],
+    moduleSpecifier: commandControllerSourceFile.getRelativePathAsModuleSpecifierTo(commandClass.getSourceFile()),
+  });
+}
+
+export async function createCommandHandler(
+  project: Project,
+  commandClass: ClassDeclaration,
+  save = true,
+): Promise<void> {
   const commandClassName = commandClass.getNameOrThrow();
   const commandHandlerClassName = `${commandClassName}Handler`;
   const handlerMethodName = decapFirstLetter(removeStringFromText(commandClassName, 'Command'));
 
-  commandHandlerSourceFile.addImportDeclaration({
-    namedImports: [commandClassName],
-    moduleSpecifier: commandHandlerSourceFile.getRelativePathAsModuleSpecifierTo(commandClass.getSourceFile()),
-  });
+  const sourceRoot = project.getCompilerOptions().sourceRoot;
+  const commandHandlerSourceFile = project.createSourceFile(
+    `${sourceRoot}/.command-handlers/${camelToKebabCase(commandClass.getNameOrThrow())}-handler.ts`,
+    '',
+    {
+      overwrite: true,
+    },
+  );
 
   commandHandlerSourceFile.addImportDeclaration({
     namedImports: ['Handles', 'Repository'],
     moduleSpecifier: '@ddk/core',
+  });
+
+  commandHandlerSourceFile.addImportDeclaration({
+    namedImports: [commandClassName],
+    moduleSpecifier: commandHandlerSourceFile.getRelativePathAsModuleSpecifierTo(commandClass.getSourceFile()),
   });
 
   // find the @Handler decorator
@@ -99,7 +167,10 @@ export function createCommandHandler(commandClass: ClassDeclaration, commandHand
   if (object.strategy === HandlerStrategy.CREATE)
     createOrLoad = `const ${aggregateName} = new ${targetConstructClassName}(command.aggregateId);`;
   if (object.strategy === HandlerStrategy.LOAD)
-    createOrLoad = `const ${aggregateName} = await this.repository.getById(command.aggregateId);`;
+    createOrLoad = [
+      `const ${aggregateName} = await this.repository.getById(command.aggregateId);`,
+      `if (!${aggregateName}) return '${aggregateName} not found';`,
+    ].join('\n');
   handlerMethod.setBodyText(
     [
       createOrLoad,
@@ -108,31 +179,28 @@ export function createCommandHandler(commandClass: ClassDeclaration, commandHand
     ].join('\n'),
   );
 
-  return commandHandlerSourceFile;
+  if (save) await saveFile(commandHandlerSourceFile);
 }
 
-export async function createCommandController(project: Project, commandClass: ClassDeclaration): Promise<void> {
+export async function createCommandController(
+  project: Project,
+  commandClass: ClassDeclaration,
+  save = true,
+): Promise<void> {
   const className = commandClass.getNameOrThrow();
   const commandProperties = commandClass.getProperties();
   const mutationName = decapFirstLetter(removeStringFromText(className, 'Command'));
 
+  const sourceRoot = project.getCompilerOptions().sourceRoot;
   const commandControllerSourceFile = project.createSourceFile(
-    `src/.command-controllers/${camelToKebabCase(commandClass.getNameOrThrow())}-controller.ts`,
+    `${sourceRoot}/.command-controllers/${camelToKebabCase(commandClass.getNameOrThrow())}-controller.ts`,
     '',
     {
       overwrite: true,
     },
   );
-  // FIXME how do we know if we need to import Arg, Authorized, Ctx, ID, Mutation, Resolver?
-  commandControllerSourceFile.addImportDeclaration({
-    namedImports: ['Arg', 'Authorized', 'Ctx', 'Mutation', 'Resolver'],
-    moduleSpecifier: '@ddk/graphql',
-  });
 
-  commandControllerSourceFile.addImportDeclaration({
-    namedImports: [className],
-    moduleSpecifier: commandControllerSourceFile.getRelativePathAsModuleSpecifierTo(commandClass.getSourceFile()),
-  });
+  handleImports(commandClass, commandControllerSourceFile, className);
 
   const resolverClass = commandControllerSourceFile.addClass({
     name: `${className}Controller`,
@@ -177,13 +245,6 @@ export async function createCommandController(project: Project, commandClass: Cl
         }
       }
     }
-    if (Object.keys(contextParamMethods).length > 0) {
-      commandControllerSourceFile.addImportDeclaration({
-        namedImports: ['Context'],
-        // FIXME this should be extracted from the command file, both the type and the location of the file
-        moduleSpecifier: '../context',
-      });
-    }
   });
 
   resolverMethod.addParameter({
@@ -208,12 +269,13 @@ export async function createCommandController(project: Project, commandClass: Cl
     .join(', ');
 
   resolverMethod.setBodyText(`console.log('messageBus.send', new ${className}(${commandArgs}));\nreturn true;`);
-  await saveFile(commandControllerSourceFile);
+  if (save) await saveFile(commandControllerSourceFile);
 }
 
-export async function createCommandControllers(project: Project): Promise<void> {
+export async function createCommandControllersAndHandlers(project: Project): Promise<void> {
   const commandClasses = findCommands(project);
   for (const commandClass of commandClasses) {
+    await createCommandHandler(project, commandClass);
     await createCommandController(project, commandClass);
   }
 }
@@ -240,36 +302,39 @@ function prepareProject(project: Project) {
 //   await rm(path.join(process.cwd(), 'src/.command-controllers'), { recursive: true, force: true });
 // }
 
-let count = 0;
-
 async function saveFile(file: SourceFile): Promise<void> {
   const formattedCode = prettier.format(file.getFullText(), {
     parser: 'typescript',
     singleQuote: true,
   });
-  file.replaceWithText(formattedCode + `\n//${count++}`);
+  file.replaceWithText(formattedCode);
   await file.save();
 }
 
 export class Builder {
-  project: Project = new Project();
+  project: Project;
 
-  constructor() {
+  constructor(sourceDir = 'src') {
+    this.project = new Project({ compilerOptions: { sourceRoot: path.join(process.cwd(), sourceDir) } });
     this.project.manipulationSettings.set({
       quoteKind: QuoteKind.Single,
     });
     loadProject(this.project);
   }
 
-  async build(changedPaths: string[]): Promise<void> {
+  async build(changedPaths: string[]): Promise<boolean> {
     try {
       // await deleteBuildDirectory();
       reloadProjectFiles(this.project, changedPaths);
       prepareProject(this.project);
-      await createCommandControllers(this.project);
-    } catch (error) {
+      await createCommandControllersAndHandlers(this.project);
+      return true;
+    } catch (e) {
+      const error = e as unknown as Error;
+      if (error.message.indexOf('File not found') !== -1) return true;
       // eslint-disable-next-line no-console
       console.error(error);
+      return false;
     }
   }
 }

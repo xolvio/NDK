@@ -1,5 +1,5 @@
 import { AggregateRoot, Command, Handler, HandlerStrategy } from '@ddk/core';
-import { Authorized, Ctx, Field, InputType } from '@ddk/graphql';
+import { Authorized, Ctx, Field, ID, InputType } from '@ddk/graphql';
 import { Context } from './context';
 import { Recipe } from './recipe';
 
@@ -7,27 +7,24 @@ import { Recipe } from './recipe';
 @InputType()
 @Handler<AggregateRoot>(Recipe, { strategy: HandlerStrategy.CREATE })
 export class AddRecipeCommand extends Command {
+  @Field(() => ID)
+  public readonly aggregateId: string;
+
   @Field(() => String)
   public readonly title: string;
 
   @Field(() => String, { nullable: true })
   public readonly description?: string;
 
-  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'none')
+  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'no-user')
   public readonly user: string;
 
-  constructor(title: string, description: string | undefined, user: string) {
+  constructor(aggregateId: string, title: string, description: string | undefined, user: string) {
     super();
+    this.aggregateId = aggregateId;
     this.title = title;
     this.description = description;
     this.user = user;
-  }
-
-  async handle(): Promise<boolean> {
-    const data = structuredClone(this) as unknown as Record<string, number | string> | string;
-    const recipe = Object.assign(Object.create(Recipe), data);
-    // await em.persist(recipe).flush();
-    return recipe !== null;
   }
 }
 
@@ -35,15 +32,21 @@ export class AddRecipeCommand extends Command {
 @InputType()
 @Handler<AggregateRoot>(Recipe, { strategy: HandlerStrategy.LOAD })
 export class DeleteRecipeCommand extends Command {
+  @Field(() => ID)
+  public readonly aggregateId: string;
+
   @Field(() => String)
   public readonly title: string;
 
-  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'foo')
+  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'sam')
   public readonly userId: string;
 
-  constructor(title: string, userId: string) {
+  constructor(aggregateId: string, title: string, userId: string) {
     super();
+    this.aggregateId = aggregateId;
     this.title = title;
     this.userId = userId;
   }
+
+  // handle overrides here?
 }

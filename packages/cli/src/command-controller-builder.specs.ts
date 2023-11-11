@@ -5,20 +5,23 @@ import prettier from 'prettier';
 
 describe.only('Command Controller Builder', () => {
   describe('createCommandController', () => {
-    it('should convert a command', async () => {
+    it('should convert a commands', async () => {
       // GIVEN
-      const project = new Project();
-      project.addSourceFileAtPath(path.join(__dirname, 'test-data', 'add-recipe-command.ts'));
+      const project = new Project({ compilerOptions: { sourceRoot: path.join(__dirname, 'test-data', 'src') } });
+      project.addSourceFileAtPath(path.join(__dirname, 'test-data', 'src', 'add-recipe-command.ts'));
       const classDeclaration = findCommands(project);
-      const commandControllerSourceFile = project.createSourceFile(
-        path.join(__dirname, 'test-data', 'add-recipe-command-controller.ts'),
-      );
       // WHEN
-      const commandController = createCommandController(classDeclaration[0], commandControllerSourceFile);
+      await createCommandController(project, classDeclaration[0], false);
+
       // THEN
-      const sourceString = prettier.format(commandController.getSourceFile().getText(), { parser: 'typescript' });
+      const sourceFileText = project
+        .getSourceFileOrThrow(
+          `${project.getCompilerOptions().sourceRoot}/.command-controllers/add-recipe-command-controller.ts`,
+        )
+        .getText();
+      const sourceString = prettier.format(sourceFileText, { parser: 'typescript' });
       const targetFile = new Project().addSourceFileAtPath(
-        path.join(__dirname, 'test-data', 'expected-add-recipe-command-controller.ts'),
+        path.join(__dirname, 'test-data', 'src', '.command-controllers', 'expected-add-recipe-command-controller.ts'),
       );
       const targetString = prettier.format(targetFile.getSourceFile().getText(), { parser: 'typescript' });
       expect(sourceString).toEqual(targetString);
@@ -27,18 +30,22 @@ describe.only('Command Controller Builder', () => {
   describe('createCommandHandler', () => {
     it('should convert a command', async () => {
       // GIVEN
-      const project = new Project();
-      project.addSourceFileAtPath(path.join(__dirname, 'test-data', 'add-recipe-command.ts'));
+      const project = new Project({ compilerOptions: { sourceRoot: path.join(__dirname, 'test-data', 'src') } });
+      project.addSourceFileAtPath(path.join(__dirname, 'test-data', 'src', 'add-recipe-command.ts'));
       const classDeclaration = findCommands(project);
-      const commandHandlerSourceFile = project.createSourceFile(
-        path.join(__dirname, 'test-data', 'add-recipe-command-handler.ts'),
-      );
+
       // WHEN
-      const commandHandler = createCommandHandler(classDeclaration[0], commandHandlerSourceFile);
+      await createCommandHandler(project, classDeclaration[0], false);
+
       // THEN
-      const sourceString = prettier.format(commandHandler.getText(), { parser: 'typescript' });
+      const sourceFileText = project
+        .getSourceFileOrThrow(
+          `${project.getCompilerOptions().sourceRoot}/.command-handlers/add-recipe-command-handler.ts`,
+        )
+        .getText();
+      const sourceString = prettier.format(sourceFileText, { parser: 'typescript' });
       const targetFile = new Project().addSourceFileAtPath(
-        path.join(__dirname, 'test-data', 'expected-add-recipe-command-handler.ts'),
+        path.join(__dirname, 'test-data', 'src', '.command-handlers', 'expected-add-recipe-command-handler.ts'),
       );
       const targetString = prettier.format(targetFile.getSourceFile().getText(), { parser: 'typescript' });
       expect(sourceString).toEqual(targetString);

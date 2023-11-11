@@ -1,6 +1,6 @@
-import { AddRecipeCommand } from './add-recipe-command';
 import { Handles, Repository } from '@ddk/core';
-import { Recipe } from './recipe';
+import { AddRecipeCommand } from '../add-recipe-command';
+import { Recipe } from '../deps/recipe';
 
 export class AddRecipeCommandHandler {
   constructor(private readonly repository: Repository<Recipe>) {}

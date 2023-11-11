@@ -13,7 +13,11 @@ function getFiles(events: ParcelWatcher.Event[]) {
 
 const builder = new Builder();
 const consoleTools = new ConsoleTools();
-consoleTools.clear().hide().animate('DDK is watching for changes.', WATCHING);
+// consoleTools.clear().hide().animate('DDK is watching for changes.', WATCHING);
+consoleTools
+  .clear()
+  .hide()
+  .animate('DDK Running http://localhost:4000/graphql ⠸ http://localhost:4000/debug ⠸ Watching...', WATCHING);
 
 async function build(consoleTools: ConsoleTools, events: Event[]) {
   consoleTools.stopAnimation().log('\n📂 Files changed!');

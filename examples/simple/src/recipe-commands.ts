@@ -11,18 +11,18 @@ export class AddRecipeCommand extends Command {
   public readonly aggregateId: string;
 
   @Field(() => String)
-  public readonly title: string;
+  public readonly toot: string;
 
   @Field(() => String, { nullable: true })
   public readonly description?: string;
 
-  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'no-user')
+  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'Dev')
   public readonly user: string;
 
-  constructor(aggregateId: string, title: string, description: string | undefined, user: string) {
+  constructor(aggregateId: string, toot: string, description: string | undefined, user: string) {
     super();
     this.aggregateId = aggregateId;
-    this.title = title;
+    this.toot = toot;
     this.description = description;
     this.user = user;
   }
@@ -36,15 +36,15 @@ export class DeleteRecipeCommand extends Command {
   public readonly aggregateId: string;
 
   @Field(() => String)
-  public readonly title: string;
+  public readonly toot: string;
 
-  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'sam')
+  @Ctx<Context>((ctx: Context) => ctx.user?.name || 'Tom')
   public readonly userId: string;
 
-  constructor(aggregateId: string, title: string, userId: string) {
+  constructor(aggregateId: string, toot: string, userId: string) {
     super();
     this.aggregateId = aggregateId;
-    this.title = title;
+    this.toot = toot;
     this.userId = userId;
   }
 

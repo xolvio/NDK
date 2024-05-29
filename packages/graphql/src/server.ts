@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { ApolloServer, ApolloServerOptions, BaseContext } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
-import { logger } from '../../logger-console/src/Logger';
+// import { logger } from '../../logger-console/src/Logger';
 import { BuildSchemaOptions, buildSchemaSync } from 'type-graphql';
 
 class GraphQLServer<Context extends BaseContext> {
@@ -18,11 +18,12 @@ class GraphQLServer<Context extends BaseContext> {
   }
 
   public static async getInstance<Context extends BaseContext>(
-    options: ApolloServerOptions<Context>,
+    options?: ApolloServerOptions<Context>,
   ): Promise<GraphQLServer<Context>> {
     if (this.instance) {
       return this.instance;
     }
+    if (!options) throw new Error('Options required for first call of getInstance');
     this.instance = new GraphQLServer(options);
     return this.instance;
   }
@@ -43,10 +44,11 @@ export class LocalGraphQLServer<Context extends BaseContext> {
     const schema = buildSchemaSync(buildSchemaOptions);
     const options = apolloOptions ? { ...schema, ...apolloOptions } : { schema };
     const apollo = await GraphQLServer.getInstance<Context>(options);
-    const { url } = await startStandaloneServer<Context>(apollo.server, {
+    // const { url } =
+    await startStandaloneServer<Context>(apollo.server, {
       listen: { port: port ?? 4000 },
       context,
     });
-    logger.log(`🚀 Server ready at: ${url}`);
+    // logger.log(`🚀 Server ready at: ${url}`);
   }
 }

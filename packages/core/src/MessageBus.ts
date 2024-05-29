@@ -19,6 +19,14 @@ export class MessageBus<Database> implements IMessageBus<Database> {
   private _eventHandlerFor: { [key: string]: EventHandler[] } = {};
   private _commandHandlerFor: { [key: string]: CommandHandler } = {};
 
+  private constructor() {
+    // singleton
+  }
+
+  public static getInstance<T>(): MessageBus<T> {
+    return new MessageBus<T>();
+  }
+
   _registerEventHandler<T extends Event>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     event: new (...args: any[]) => T,

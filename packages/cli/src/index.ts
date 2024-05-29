@@ -6,6 +6,8 @@ import ParcelWatcher, { Event } from '@parcel/watcher';
 import process from 'process';
 import { BUILDING, ConsoleTools, WATCHING } from './console-tools';
 import { queuedFunction } from './queue';
+import { ChildProcess, spawn } from 'child_process';
+import path from 'path';
 
 function getFiles(events: ParcelWatcher.Event[]) {
   return events.filter((event) => event.path.indexOf('.ts~') === -1).map((event) => event.path);
@@ -13,32 +15,57 @@ function getFiles(events: ParcelWatcher.Event[]) {
 
 const builder = new Builder();
 const consoleTools = new ConsoleTools();
+
 // consoleTools.clear().hide().animate('DDK is watching for changes.', WATCHING);
-consoleTools
-  .clear()
-  .hide()
-  .animate('DDK Running http://localhost:4000/graphql ⠸ http://localhost:4000/debug ⠸ Watching...', WATCHING);
+
+function waitingMessage(delay = 0) {
+  setTimeout(
+    () =>
+      consoleTools
+        .clear()
+        .hide()
+        .animate('DDK Running ⠸ http://localhost:4000/graphql ⠸ http://localhost:4000/debug ⠸ Watching...', WATCHING),
+    delay,
+  );
+}
 
 async function build(consoleTools: ConsoleTools, events: Event[]) {
-  consoleTools.stopAnimation().log('\n📂 Files changed!');
+  consoleTools.stopAnimation();
+  if (events.length > 0) consoleTools.log('\n📂 Files changed!');
   consoleTools.animate('Building...', BUILDING);
   await builder.build(getFiles(events));
   consoleTools.stopAnimation().log('\n✅ Build complete.');
-  setTimeout(() => {
-    consoleTools.clear().hide().animate('DDK is watching for changes...', WATCHING);
-  }, 300);
+}
+
+let serverProcess: ChildProcess;
+
+function restartServer() {
+  if (serverProcess) {
+    serverProcess.kill('SIGINT');
+  }
+  serverProcess = spawn('ts-node', [path.join(__dirname, 'serve.ts')], {
+    stdio: 'inherit',
+  });
+  serverProcess.on('exit', function (code /*signal*/) {
+    if (code === 0) {
+      consoleTools.stopAnimation().log('\n🔄 Server restarted successfully');
+    }
+  });
+}
+
+async function buildLoop(events: Event[]): Promise<void> {
+  await build(consoleTools, events);
+  restartServer();
+  waitingMessage(300);
 }
 
 (async () => {
+  consoleTools.clear().hide().animate('DDK is starting...', WATCHING);
   await watcher.subscribe(
     process.cwd(),
-    queuedFunction(async (_err, events) => await build(consoleTools, events)),
+    queuedFunction(async (_err, events) => await buildLoop(events)),
     { ignore: ['**/.command-controllers/**', '**/.command-handlers/**'] },
   );
-
-  // stop server
-  // loop to restart whenever files change
-
-  // await serve();
-  // if (Math.random() > 1) await serve();
+  // if (Math.random()) return;
+  await buildLoop([]);
 })();

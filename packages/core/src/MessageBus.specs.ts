@@ -8,8 +8,8 @@ import { IReadModel } from './IReadModel';
 import { Ack } from './Ack';
 
 class FooCommand extends Command {
-  constructor(id: string) {
-    super(id);
+  constructor(public readonly id: string) {
+    super();
   }
 }
 
@@ -42,7 +42,7 @@ class MyReadModel implements IReadModel<unknown> {
 describe('MessageBus', () => {
   describe('EventHandlers', () => {
     it('should allow wildcard subscription', async () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
 
       const events: Event[] = [];
       messageBus._registerEventHandler(ANY, async (event: Event): Promise<void> => {
@@ -59,7 +59,7 @@ describe('MessageBus', () => {
       expect(events[1]).toEqual(bar);
     });
     it('should allow wildcard subscription', async () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
 
       const events: Event[] = [];
       messageBus._registerEventHandler(FooEvent, async (event: Event): Promise<void> => {
@@ -77,7 +77,7 @@ describe('MessageBus', () => {
     it('should register event handlers with the registry', () => {
       const registry = Registry.getInstance();
       jest.spyOn(registry, 'registerEventHandlerInstance');
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       // messageBus.registerEventHandler();
       const eventHandler = {
         handle: async (): Promise<void> => {
@@ -90,7 +90,7 @@ describe('MessageBus', () => {
   });
   describe('publish', () => {
     it('should call the specific event handlers', async () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       const mock = jest.fn();
       const handler = async (e: Event) => {
         mock(e);
@@ -102,7 +102,7 @@ describe('MessageBus', () => {
       expect(mock).toHaveBeenCalled();
     });
     it('should call wildcard event handlers', async () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       const mock = jest.fn();
       const handler = async (e: Event) => {
         mock(e);
@@ -114,7 +114,7 @@ describe('MessageBus', () => {
       expect(mock).toHaveBeenCalled();
     });
     it('should log errors from specific handlers and rethrow', async () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       const handler = async () => {
         throw new Error('foo');
       };
@@ -124,7 +124,7 @@ describe('MessageBus', () => {
       await expect(messageBus.publish(new FooEvent('1'))).rejects.toThrow();
     });
     it('should log errors from wildcard handlers and rethrow', async () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       const handler = async () => {
         throw new Error('foo');
       };
@@ -139,12 +139,12 @@ describe('MessageBus', () => {
       const registry = Registry.getInstance();
       jest.spyOn(registry, 'registerCommandHandlerInstance');
 
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       messageBus.registerCommandHandlers({});
       expect(registry.registerCommandHandlerInstance).toHaveBeenCalledWith({}, messageBus);
     });
     it('should send commands to the respective command handler', async () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       const mock = jest.fn();
       const handler = async (c: Command) => mock(c);
 
@@ -155,7 +155,7 @@ describe('MessageBus', () => {
       expect(mock).toHaveBeenCalled();
     });
     it('should warn when there are no command handlers', async () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       const warn = jest.spyOn(console, 'warn').mockImplementation(() => {
         // empty for testing
       });
@@ -164,7 +164,7 @@ describe('MessageBus', () => {
       expect(warn).toHaveBeenCalled();
     });
     it('should return an ACK when there are no errors from command handlers', async () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       const handler = async () => {
         // empty for testing
       };
@@ -173,14 +173,14 @@ describe('MessageBus', () => {
       expect(res.constructor.name).toEqual(Ack.name);
     });
     it('should return an ACK when the command returns an empty message', async () => {
-      const messageBus = new MessageBus();
       const handler = async () => '';
+      const messageBus = MessageBus.getInstance();
       messageBus.registerCommandHandler(FooCommand, handler);
       const res = (await messageBus.send(new FooCommand('1'))) as Nack;
       expect(res.constructor.name).toEqual(Ack.name);
     });
     it('should return a NACK when the command handler returns an error message', async () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       const handler = async () => 'Some error occurred';
       messageBus.registerCommandHandler(FooCommand, handler);
 
@@ -190,7 +190,7 @@ describe('MessageBus', () => {
       expect(res.errorCode).toEqual('Some error occurred');
     });
     it('should return a NACK when a command handlers throws an error', async () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       const handler = async () => {
         throw new Error('foo');
       };
@@ -201,7 +201,7 @@ describe('MessageBus', () => {
       expect(res.errorCode).toEqual(NackErrors.ApplicationError);
     });
     it('should send internal commands to the respective command handler', () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       const mock = jest.fn();
       const handler = async (c: Command) => mock(c);
 
@@ -216,14 +216,14 @@ describe('MessageBus', () => {
     it('should register read models with the registry and return them', () => {
       const registry = Registry.getInstance();
       jest.spyOn(registry, 'registerReadModelHandlerInstance');
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       const myReadModel = new MyReadModel();
       const readModel = messageBus.registerReadModel(myReadModel);
       expect(registry.registerReadModelHandlerInstance).toHaveBeenCalledWith(readModel, messageBus);
       expect(readModel).toBe(myReadModel);
     });
     it('should update read registered models', async () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       const myReadModel = new MyReadModel();
       jest.spyOn(myReadModel, 'handle');
 
@@ -236,7 +236,7 @@ describe('MessageBus', () => {
       expect(readModel.handle).toHaveBeenCalledWith(event, 'foo');
     });
     it('should log and rethrow errors from read models', async () => {
-      const messageBus = new MessageBus();
+      const messageBus = MessageBus.getInstance();
       const myReadModel = new MyReadModel();
       myReadModel.handle = async () => {
         throw new Error('bar');

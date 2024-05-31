@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   AllStreamResolvedEvent,
   ANY,
@@ -20,8 +21,8 @@ import {
   IMessageBus,
   PositionalEvent,
   Serializer,
-} from '@xspecs/ddk';
-import { logger } from '@xspecs/logger';
+} from '@ddk/core';
+import { logger } from '@ddk/logger';
 import { WrongExpectedVersionError } from './WrongExpectedVersionError';
 
 const serializer = new Serializer();

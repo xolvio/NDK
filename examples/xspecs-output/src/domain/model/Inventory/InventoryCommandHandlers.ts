@@ -7,7 +7,7 @@ export class InventoryCommandHandlers {
 
   @Handles(Commands.AddInventoryItem)
   async addInventoryItem(c: Commands.AddInventoryItem): Promise<string | void> {
-    const inventory = new Inventory(c.aggregateId ?? '1234');
+    const inventory = new Inventory(c.id ?? '1234');
     if (!inventory.addInventoryItem(c.itemName, c.itemDescription, c.itemPrice, c.itemQuantity))
       return inventory.getError();
     await this.inventoryRepository.save(inventory);

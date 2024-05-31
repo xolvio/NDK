@@ -1,5 +1,5 @@
 import { inspect } from 'util';
-import { ILogger } from '../../core/src/ILogger';
+import { ILogger } from '@ddk/core/src/ILogger';
 
 class Logger implements ILogger {
   private static _instance: Logger;

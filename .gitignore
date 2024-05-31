@@ -3,3 +3,5 @@ dist
 .idea
 node_modules
 .env
+.command-controllers
+.command-handlers

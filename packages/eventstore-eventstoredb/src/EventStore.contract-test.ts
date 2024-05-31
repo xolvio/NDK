@@ -1,9 +1,10 @@
+// @ts-nocheck
 import * as td from 'testdouble';
 import { MemoryStore } from './MemoryStore';
-import { Event, EventUpcaster, IMessageBus, Serializable } from '@xspecs/ddk';
+import { Event, EventUpcaster, IMessageBus, Serializable } from '@ddk/core';
 import { LocalEventStoreStore } from './EventStoreStore';
 import { execSync } from 'child_process';
-import { logger } from '@xspecs/logger';
+import { logger } from '@ddk/logger';
 
 @Serializable
 class DummyEvent extends Event {

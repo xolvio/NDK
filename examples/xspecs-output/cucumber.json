@@ -1,0 +1,20 @@
+{
+  "default": {
+    "format": ["summary","@cucumber/pretty-formatter"],
+    "requireModule": ["ts-node/register"],
+    "paths": ["./specs/features"],
+    "require": ["specs/support/*.ts"],
+    "formatOptions": {"snippetInterface": "async-await"}
+  },
+  "### -- JSON DOESN'T SUPPORT COMMENTS, SO LET'S FORCE IT -- ###": {
+    "config docs": "https://github.com/cucumber/cucumber-js/blob/main/docs/configuration.md",
+    "world docs": "https://github.com/cucumber/cucumber-js/blob/main/docs/support_files/world.md",
+    "parallel runs": "https://github.com/cucumber/cucumber-js/blob/main/docs/parallel.md",
+    "here are the formatters that can be used": [
+      "@cucumber/pretty-formatter",
+      "progress-bar",
+      "html:.reports/cucumber-report.html",
+      "junit:.reports/junit.xml"
+    ]
+  }
+}

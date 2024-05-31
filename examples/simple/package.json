@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Simple",
   "scripts": {
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "run": "ts-node ./index.ts"
   },
   "dependencies": {
     "@ddk/core": "*",

@@ -1,5 +1,6 @@
-import { Event, ILocalEventStore, IMessageBus, PositionalEvent } from '@xspecs/ddk';
-import { logger } from '@xspecs/logger';
+// @ts-nocheck
+import { Event, ILocalEventStore, IMessageBus, PositionalEvent } from '@ddk/core';
+import { logger } from '@ddk/logger';
 import { WrongExpectedVersionError } from './WrongExpectedVersionError';
 
 export class MemoryStore implements ILocalEventStore {
@@ -10,6 +11,7 @@ export class MemoryStore implements ILocalEventStore {
 
   constructor(environment: string, messageBus: IMessageBus<unknown>) {
     this._messageBus = messageBus;
+    logger.debug(`MemoryStore: created`, environment);
   }
 
   public async reset(): Promise<void> {

@@ -1,5 +1,8 @@
 {
   "name": "@ddk/test-app",
+  "scripts": {
+    "test": "cucumber-js"
+  },
   "dependencies": {
     "@ddk/core": "*",
     "@ddk/event-store-db": "*",
@@ -7,6 +10,7 @@
   },
   "devDependencies": {
     "@cucumber/cucumber": "*",
+    "@cucumber/pretty-formatter": "*",
     "@ddk/cli": "*"
   }
 }

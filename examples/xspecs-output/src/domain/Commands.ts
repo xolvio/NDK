@@ -4,6 +4,8 @@ import { Field, InputType } from 'type-graphql';
 @InputType()
 export class AddInventoryItem extends Command {
   @Field()
+  public readonly id: string;
+  @Field()
   public readonly itemName: string;
   @Field()
   public readonly itemDescription: string;
@@ -12,8 +14,9 @@ export class AddInventoryItem extends Command {
   @Field()
   public readonly itemQuantity: number;
 
-  constructor(itemName: string, itemDescription: string, itemPrice: number, itemQuantity: number) {
+  constructor(id: string, itemName: string, itemDescription: string, itemPrice: number, itemQuantity: number) {
     super();
+    this.id = id;
     this.itemQuantity = itemQuantity;
     this.itemPrice = itemPrice;
     this.itemDescription = itemDescription;

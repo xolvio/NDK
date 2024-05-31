@@ -1,0 +1,13 @@
+{
+  "name": "@ddk/logger",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.9.4",
+    "graphql": "^16.8.1",
+    "graphql-scalars": "^1.22.4"
+  }
+}
